@@ -1,0 +1,12 @@
+# Rust build cache
+aes/target
+x25519/target
+xeddsa/target
+
+# Intermediate wasm-pack output (root pkg/ is the real output)
+aes/pkg
+x25519/pkg
+xeddsa/pkg
+
+# Node
+node_modules

@@ -1,0 +1,10 @@
+{
+  "name": "echo-protocol-build",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build":   "node build.js",
+    "release": "node build.js && cd pkg && npm publish --access public"
+  }
+}
