@@ -1,0 +1,31 @@
+{
+  "name": "@mascaro101/echo-protocol",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Rust primitives for Echo Protocol",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "aes.js",
+    "aes_bg.wasm",
+    "aes_bg.wasm.d.ts",
+    "x25519.js",
+    "x25519_bg.wasm",
+    "x25519_bg.wasm.d.ts",
+    "xeddsa.js",
+    "xeddsa_bg.wasm",
+    "xeddsa_bg.wasm.d.ts"
+  ],
+  "keywords": [
+    "echo-protocol",
+    "end-to-end-encryption"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pringles505/Echo-Protocol.git"
+  },
+  "sideEffects": false
+}
