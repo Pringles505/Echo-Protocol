@@ -10,6 +10,8 @@ export function generate_private_prekey(js_random_bytes: Uint8Array): Uint8Array
 export function generate_public_ephemeral_key(private_prekey_bytes: Uint8Array): Uint8Array;
 export function generate_private_ephemeral_key(js_random_bytes: Uint8Array): Uint8Array;
 export function hkdf_derive(input_key_material: Uint8Array, salt: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
+export function hkdf_extract(salt: Uint8Array, ikm: Uint8Array): Uint8Array;
+export function hkdf_expand(prk: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -23,6 +25,8 @@ export interface InitOutput {
   readonly generate_public_ephemeral_key: (a: number, b: number) => [number, number];
   readonly generate_private_ephemeral_key: (a: number, b: number) => [number, number];
   readonly hkdf_derive: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
+  readonly hkdf_extract: (a: number, b: number, c: number, d: number) => [number, number];
+  readonly hkdf_expand: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly generate_public_prekey: (a: number, b: number) => [number, number];
   readonly generate_private_prekey: (a: number, b: number) => [number, number];
   readonly __wbindgen_exn_store: (a: number) => void;

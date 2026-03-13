@@ -312,6 +312,39 @@ export function hkdf_derive(input_key_material, salt, info, output_len) {
     return v4;
 }
 
+/**
+ * @param {Uint8Array} salt
+ * @param {Uint8Array} ikm
+ * @returns {Uint8Array}
+ */
+export function hkdf_extract(salt, ikm) {
+    const ptr0 = passArray8ToWasm0(salt, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArray8ToWasm0(ikm, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.hkdf_extract(ptr0, len0, ptr1, len1);
+    var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v3;
+}
+
+/**
+ * @param {Uint8Array} prk
+ * @param {Uint8Array} info
+ * @param {number} output_len
+ * @returns {Uint8Array}
+ */
+export function hkdf_expand(prk, info, output_len) {
+    const ptr0 = passArray8ToWasm0(prk, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArray8ToWasm0(info, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.hkdf_expand(ptr0, len0, ptr1, len1, output_len);
+    var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v3;
+}
+
 async function __wbg_load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
         if (typeof WebAssembly.instantiateStreaming === 'function') {

@@ -208,9 +208,40 @@ pub fn hkdf_derive(input_key_material: &[u8], salt: &[u8], info: &[u8], output_l
     okm
 }
 
+// The previous HKDF implementation is a combined Extract+Expand. For MLS we need seperate Extract and Expand functions
+
+// HKDF Extract
+#[wasm_bindgen]
+pub fn hkdf_extract(salt: &[u8], ikm: &[u8]) -> Vec<u8> {
+    let salt_opt = if salt.is_empty() { None } else { Some(salt) };
+    let (prk, _hkdf) = Hkdf::<Sha256>::extract(salt_opt, ikm);
+    prk.to_vec()
+}
+
+// HKDF Expand
+#[wasm_bindgen]
+pub fn hkdf_expand(prk: &[u8], info: &[u8], output_len: usize) -> Vec<u8> {
+    let hkdf = Hkdf::<Sha256>::from_prk(prk)
+        .expect("PRK must be at least HashLen (32) bytes");
+    let mut okm = vec![0u8; output_len];
+    hkdf.expand(info, &mut okm)
+        .expect("output_len too large for HKDF-Expand (max 8160 bytes)");
+    okm
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn hex_to_bytes(hex: &str) -> Vec<u8> {
+        assert!(hex.len() % 2 == 0);
+        (0..hex.len())
+            .step_by(2)
+            .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap())
+            .collect()
+    }
 
     // Helper function to avoid JsValue in tests
     fn test_derive_x25519_from_ed25519(ed25519_seed: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
@@ -554,6 +585,67 @@ mod tests {
 
         let output = hkdf_derive(ikm, salt, info, 32);
         assert_eq!(output.len(), 32);
+    }
+
+    #[test]
+    fn test_hkdf_extract_rfc5869_case_1() {
+        let ikm = vec![0x0b; 22];
+        let salt = hex_to_bytes("000102030405060708090a0b0c");
+
+        let prk = hkdf_extract(&salt, &ikm);
+        let expected_prk = hex_to_bytes(concat!(
+            "077709362c2e32df0ddc3f0dc47bba63",
+            "90b6c73bb50f9c3122ec844ad7c2b3e5"
+        ));
+
+        assert_eq!(prk, expected_prk);
+    }
+
+    #[test]
+    fn test_hkdf_expand_rfc5869_case_1() {
+        let prk = hex_to_bytes(concat!(
+            "077709362c2e32df0ddc3f0dc47bba63",
+            "90b6c73bb50f9c3122ec844ad7c2b3e5"
+        ));
+        let info = hex_to_bytes("f0f1f2f3f4f5f6f7f8f9");
+
+        let okm = hkdf_expand(&prk, &info, 42);
+        let expected_okm = hex_to_bytes(concat!(
+            "3cb25f25faacd57a90434f64d0362f2a",
+            "2d2d0a90cf1a5a4c5db02d56ecc4c5bf",
+            "34007208d5b887185865"
+        ));
+
+        assert_eq!(okm, expected_okm);
+    }
+
+    #[test]
+    fn test_hkdf_extract_expand_matches_hkdf_derive() {
+        let ikm = b"input key material";
+        let salt = b"salt";
+        let info = b"context info";
+
+        let prk = hkdf_extract(salt, ikm);
+        let okm_via_split = hkdf_expand(&prk, info, 48);
+        let okm_via_combined = hkdf_derive(ikm, salt, info, 48);
+
+        assert_eq!(okm_via_split, okm_via_combined);
+    }
+
+    #[test]
+    fn test_hkdf_extract_empty_salt_matches_none_salt_semantics() {
+        let ikm = b"ikm-value";
+        let prk_from_empty = hkdf_extract(b"", ikm);
+        let (expected_prk, _hkdf) = Hkdf::<Sha256>::extract(None, ikm);
+
+        assert_eq!(prk_from_empty, expected_prk.to_vec());
+    }
+
+    #[test]
+    #[should_panic(expected = "PRK must be at least HashLen (32) bytes")]
+    fn test_hkdf_expand_panics_on_short_prk() {
+        let short_prk = [0x11u8; 31];
+        let _ = hkdf_expand(&short_prk, b"info", 16);
     }
 
     #[test]
