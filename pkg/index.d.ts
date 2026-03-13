@@ -20,6 +20,8 @@ export function generate_private_prekey(js_random_bytes: Uint8Array): Uint8Array
 export function generate_public_ephemeral_key(private_prekey_bytes: Uint8Array): Uint8Array;
 export function generate_private_ephemeral_key(js_random_bytes: Uint8Array): Uint8Array;
 export function hkdf_derive(input_key_material: Uint8Array, salt: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
+export function hkdf_extract(salt: Uint8Array, input_key_material: Uint8Array): Uint8Array;
+export function hkdf_expand(pseudo_random_key: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
 
 //    XEdDSA Signatures                                                         
 export function convert_x25519_to_xeddsa(private_key_bytes: Uint8Array): Uint8Array;

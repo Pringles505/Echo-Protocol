@@ -12,7 +12,7 @@ const crates = [
   { dir: 'xeddsa', name: 'xeddsa' },
 ]
 
-//    Preserve pkg metadata before wiping                                      
+// Preserve pkg metadata before wiping                                      
 
 const preserve = ['package.json', 'README.md', 'EchoProtocolLogo.png']
 const saved = {}
@@ -28,7 +28,7 @@ for (const [f, buf] of Object.entries(saved)) {
   writeFileSync(join(PKG, f), buf)
 }
 
-//    Build each Rust crate                                                      
+// Build each Rust crate                                                      
 
 for (const { dir, name } of crates) {
   const crateDir = join(ROOT, dir)
@@ -50,7 +50,7 @@ for (const { dir, name } of crates) {
   cpSync(join(src, `${name}.d.ts`), join(PKG, `${name}.d.ts`))
 }
 
-//    Write unified index.js                                                     
+// Write unified index.js                                                     
 
 writeFileSync(join(PKG, 'index.js'), `\
 import initAes, {
@@ -70,6 +70,8 @@ import initX25519, {
   generate_public_ephemeral_key,
   generate_private_ephemeral_key,
   hkdf_derive,
+  hkdf_extract,
+  hkdf_expand,
 } from './x25519.js'
 
 import initXeddsa, {
@@ -107,6 +109,8 @@ export {
   generate_public_ephemeral_key,
   generate_private_ephemeral_key,
   hkdf_derive,
+  hkdf_extract,
+  hkdf_expand,
 }
 
 // XEdDSA signatures
@@ -125,7 +129,7 @@ export {
 export default init
 `)
 
-//    Write unified index.d.ts                                                   
+// Write unified index.d.ts                                                   
 
 writeFileSync(join(PKG, 'index.d.ts'), `\
 /* tslint:disable */
@@ -150,6 +154,8 @@ export function generate_private_prekey(js_random_bytes: Uint8Array): Uint8Array
 export function generate_public_ephemeral_key(private_prekey_bytes: Uint8Array): Uint8Array;
 export function generate_private_ephemeral_key(js_random_bytes: Uint8Array): Uint8Array;
 export function hkdf_derive(input_key_material: Uint8Array, salt: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
+export function hkdf_extract(salt: Uint8Array, input_key_material: Uint8Array): Uint8Array;
+export function hkdf_expand(pseudo_random_key: Uint8Array, info: Uint8Array, output_len: number): Uint8Array;
 
 //    XEdDSA Signatures                                                         
 export function convert_x25519_to_xeddsa(private_key_bytes: Uint8Array): Uint8Array;

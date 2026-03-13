@@ -15,6 +15,8 @@ import initX25519, {
   generate_public_ephemeral_key,
   generate_private_ephemeral_key,
   hkdf_derive,
+  hkdf_extract,
+  hkdf_expand,
 } from './x25519.js'
 
 import initXeddsa, {
@@ -52,6 +54,8 @@ export {
   generate_public_ephemeral_key,
   generate_private_ephemeral_key,
   hkdf_derive,
+  hkdf_extract,
+  hkdf_expand,
 }
 
 // XEdDSA signatures
